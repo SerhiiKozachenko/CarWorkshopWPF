@@ -4,16 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CarWorkshop.WPF.Pages.Appointments"
+             xmlns:System="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <GroupBox Header="Appointments" Margin="10,0,249,0">
-            <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding Appointments}" SelectedItem="{Binding Appointment}">
+            <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding Appointments}" SelectedItem="{Binding Appointment}" SelectionMode="Single" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Username" Binding="{Binding Username}"/>
-                    <DataGridTextColumn Header="CarTrademark" Binding="{Binding CarTrademark}"/>
-                    <DataGridTextColumn Header="CompanyName" Binding="{Binding CompanyName}" />
-                    <DataGridTextColumn Header="AppointmentAt" Binding="{Binding AppointmentAt}" />
+                    <DataGridTextColumn Header="Username" Binding="{Binding Username, Mode=OneTime}"/>
+                    <DataGridTextColumn Header="CarTrademark" Binding="{Binding CarTrademark, Mode=OneTime}"/>
+                    <DataGridTextColumn Header="CompanyName" Binding="{Binding CompanyName, Mode=OneTime}" />
+                    <DataGridTextColumn Header="AppointmentAt" Binding="{Binding AppointmentAt, Mode=OneTime}" />
                 </DataGrid.Columns>
             </DataGrid>
         </GroupBox>
@@ -21,20 +22,32 @@
         <GroupBox Header="Edit" HorizontalAlignment="Right" Width="244">
             <StackPanel>
                 <Label Content="Username:"/>
-                <TextBox Text="{Binding Path=Appointment.Username, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,5,0" />
+                <!--<TextBox Text="{Binding Path=Appointment.Username, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,5,0" />-->
+                <ComboBox ItemsSource="{Binding Usernames}" SelectedItem="{Binding Path=Appointment.Username}" Margin="5,0,5,0" />
+                <TextBlock Text="{Binding UsernameValidationError}" Foreground="Red" Margin="5,5,0,0"/>
 
                 <Label Content="CarTrademark:" />
                 <TextBox Text="{Binding Path=Appointment.CarTrademark, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,5,0" />
+                <TextBlock Text="{Binding CarTrademarkValidationError}" Foreground="Red" Margin="5,5,0,0"/>
 
                 <Label Content="CompanyName:" />
-                <TextBox Text="{Binding Path=Appointment.CompanyName, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,5,0" />
+                <!--<TextBox Text="{Binding Path=Appointment.CompanyName, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,5,0" />-->
+                <ComboBox ItemsSource="{Binding CompanyNames}" SelectedItem="{Binding Path=Appointment.CompanyName}" Margin="5,0,5,0" />
+                <TextBlock Text="{Binding CompanyNameValidationError}" Foreground="Red" Margin="5,5,0,0"/>
 
                 <Label Content="Appointment at:" />
-                <TextBox Text="{Binding Path=Appointment.AppointmentAt, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,5,0" />
+                <WrapPanel>
+                    <DatePicker SelectedDate="{Binding Path=Appointment.AppointmentAt, UpdateSourceTrigger=PropertyChanged}"  FirstDayOfWeek="Monday" Margin="5,0,0,0"/>
+                    <ComboBox ItemsSource="{Binding Hours}" SelectedItem="{Binding Path=Appointment.AppointmentAtHour}" Width="55" Margin="5,0,0,0" />
+                    <ComboBox ItemsSource="{Binding Minutes}" SelectedItem="{Binding Path=Appointment.AppointmentAtMinute}" Width="55" Margin="5,0,5,0" />
+                </WrapPanel>
+                <TextBlock Text="{Binding AppointmentAtValidationError}" Foreground="Red" Margin="5,5,0,0"/>
 
                 <WrapPanel>
-                    <Button Content="Save" Margin="5,20,0,0" Background="LightGreen" Width="50" />
-                    <Button Content="Delete" Margin="5,20,0,0" Background="IndianRed" Width="50" />
+                    <Button Content="Add" Command="{Binding AddCommand}" Margin="5,20,0,0" Background="LightGreen" Width="50" />
+                    <Button Content="Delete" Command="{Binding DeleteCommand}" Margin="5,20,0,0" Background="IndianRed" Width="50" />
+                    <Button Content="Clear" Command="{Binding ClearCommand}" Margin="5,20,0,0" Width="50" />
+                    <Button Content="Update" Command="{Binding UpdateCommand}" IsEnabled="{Binding Path=Appointment.IsSaved, Mode=OneWay}" Margin="5,20,0,0" Width="50" />
                 </WrapPanel>
             </StackPanel>
         </GroupBox>

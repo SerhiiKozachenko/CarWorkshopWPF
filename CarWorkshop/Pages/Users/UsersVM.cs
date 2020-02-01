@@ -64,7 +64,11 @@ namespace CarWorkshop.WPF.Pages.Users
             }
         }
 
-        public bool HasValidationError => !new List<string> { this.UsernameValidationError, this.EmailValidationError }.All(string.IsNullOrEmpty);
+        public bool HasValidationError =>
+            !new List<string> {
+                this.UsernameValidationError,
+                this.EmailValidationError
+            }.All(string.IsNullOrEmpty);
 
         public ICommand AddCommand
         {
@@ -118,14 +122,7 @@ namespace CarWorkshop.WPF.Pages.Users
 
         public void Add(object param)
         {
-            this.ResetValidationErrors();
-
-            // Validate
-            if (string.IsNullOrEmpty(this.User.Username))
-                this.UsernameValidationError = "Username required";
-
-            if (string.IsNullOrEmpty(this.User.Email))
-                this.EmailValidationError = "Email required";
+            this.Validate();
 
             if (this.HasValidationError)
                 return;
@@ -185,9 +182,21 @@ namespace CarWorkshop.WPF.Pages.Users
             this.User = new UserModel();
         }
 
+        public void Validate()
+        {
+            this.ResetValidationErrors();
+
+            if (string.IsNullOrEmpty(this.User.Username))
+                this.UsernameValidationError = "Username required";
+
+            if (string.IsNullOrEmpty(this.User.Email))
+                this.EmailValidationError = "Email required";
+        }
+
         public void ResetValidationErrors()
         {
-            this.UsernameValidationError = this.EmailValidationError = null;
+            this.UsernameValidationError =
+                this.EmailValidationError = null;
         }
     }
 }

@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace CarWorkshop.Core.Services
 {
-    public class WorkshopService : IWorkshopService
+    public class WorkshopServiceAsync : IWorkshopServiceAsync
     {
         private readonly IRepositoryAsync<Workshop> _workshopsRepo;
         private readonly IUnitOfWork _unitOfWork;
 
-        public WorkshopService(
+        public WorkshopServiceAsync(
             IRepositoryAsync<Workshop> workshopsRepo,
             IUnitOfWork unitOfWork
             )

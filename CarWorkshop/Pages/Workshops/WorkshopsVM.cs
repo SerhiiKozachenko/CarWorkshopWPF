@@ -9,7 +9,7 @@ namespace CarWorkshop.WPF.Pages.Workshops
 {
     public class WorkshopsVM : BaseViewModel, IPageModel
     {
-        private readonly IWorkshopService _workshopService;
+        private readonly IWorkshopServiceAsync _workshopService;
         private WorkshopModel _workshop;
         private string _companyNameValidationError;
         private string _currentCity;
@@ -100,7 +100,7 @@ namespace CarWorkshop.WPF.Pages.Workshops
             }
         }
 
-        public WorkshopsVM(IWorkshopService workshopService)
+        public WorkshopsVM(IWorkshopServiceAsync workshopService)
         {
             _workshopService = workshopService;
             _workshop = new WorkshopModel();

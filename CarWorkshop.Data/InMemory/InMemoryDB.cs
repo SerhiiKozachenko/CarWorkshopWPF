@@ -42,7 +42,7 @@ namespace CarWorkshop.Data.InMemory
             _workshops.Add(new Workshop() { Id = 3, CompanyName = "Lux Auto Service", CarTrademarks = "BMW, Audi, Mercedes", City = "Berlin", Country = "Germany", PostalCode = "10115" });
             _workshops.Add(new Workshop() { Id = 4, CompanyName = "Best Auto Service", CarTrademarks = "VW, Audi, Ford", City = "Berlin", Country = "Germany", PostalCode = "10178" });
 
-            _appointments.Add(new Appointment() { Id = 1, Username = "John", CarTrademark = "BMW", CompanyName = "Lux Auto Service", AppointmentAt = DateTime.Now.AddDays(1) });
+            _appointments.Add(new Appointment() { Id = 1, Username = "John", CarTrademark = "BMW", CompanyName = "Lux Auto Service", AppointmentAt = DateTime.Now.AddDays(1).AddMinutes(23) });
             _appointments.Add(new Appointment() { Id = 2, Username = "David", CarTrademark = "Ford", CompanyName = "Auto Service Munich", AppointmentAt = DateTime.Now.AddDays(2) });
         }
 

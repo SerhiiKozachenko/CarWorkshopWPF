@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace CarWorkshop.Core.Abstractions
 {
-    public interface IWorkshopService
+    public interface IWorkshopServiceAsync
     {
         Task<List<Workshop>> GetWorkshopsAsync(int skip, int take);
         Task<List<Workshop>> GetWorkshopsInCityAsync(string city, int skip, int take);

@@ -14,7 +14,8 @@ namespace CarWorkshop.WPF.Infra
         {
             // Core
             services.AddTransient<IUserServiceAsync, UserServiceAsync>();
-            services.AddTransient<IWorkshopService, WorkshopService>();
+            services.AddTransient<IWorkshopServiceAsync, WorkshopServiceAsync>();
+            services.AddTransient<IAppointmentServiceAsync, AppointmentServiceAsync>();
 
             // Data
             services.AddSingleton<InMemoryDB>();
