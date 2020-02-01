@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="CarWorkshop.WPF.Pages.Users.UsersPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CarWorkshop.WPF.Pages.Users"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <GroupBox Header="Users" Margin="10,0,249,0">
+            <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding Users}" SelectedItem="{Binding User}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Username" Binding="{Binding Username, Mode=OneTime}"/>
+                    <DataGridTextColumn Header="Email" Binding="{Binding Email, Mode=OneTime}"/>
+                    <DataGridTextColumn Header="City" Binding="{Binding City, Mode=OneTime}" />
+                    <DataGridTextColumn Header="PostalCode" Binding="{Binding PostalCode, Mode=OneTime}" />
+                    <DataGridTextColumn Header="Country" Binding="{Binding Country, Mode=OneTime}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+
+        <GroupBox Header="Edit" HorizontalAlignment="Right" Width="244">
+            <StackPanel>
+                <Label Content="Username:"/>
+                <TextBox Text="{Binding Path=User.Username, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,5,0" />
+                <TextBlock Text="{Binding UsernameValidationError}" Foreground="Red" Margin="5,5,0,0"/>
+
+                <Label Content="Email:" />
+                <TextBox Text="{Binding Path=User.Email, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,5,0" />
+                <TextBlock Text="{Binding EmailValidationError}" Foreground="Red" Margin="5,5,0,0"/>
+
+                <Label Content="City:" />
+                <TextBox Text="{Binding Path=User.City, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,5,0" />
+
+                <Label Content="Postal code:" />
+                <TextBox Text="{Binding Path=User.PostalCode, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,5,0" />
+
+                <Label Content="Country:" />
+                <TextBox Text="{Binding Path=User.Country, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,5,0" />
+
+                <WrapPanel>
+                    <Button Content="Add" Command="{Binding AddCommand}" Margin="5,20,0,0" Background="LightGreen" Width="50" />
+                    <Button Content="Delete" Command="{Binding DeleteCommand}" Margin="5,20,0,0" Background="IndianRed" Width="50" />
+                    <Button Content="Clear" Command="{Binding ClearCommand}" Margin="5,20,0,0" Width="50" />
+                </WrapPanel>
+            </StackPanel>
+        </GroupBox>
+    </Grid>
+</UserControl>
