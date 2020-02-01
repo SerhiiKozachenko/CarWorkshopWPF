@@ -105,7 +105,7 @@ namespace CarWorkshop.WPF.Pages.Users
             _user = new UserModel();
             this.Users = new ObservableCollection<UserModel>();
 
-            var usersTask = _usersService.GetAllAsync(skip: 0, take: 100);
+            var usersTask = _usersService.GetUsersAsync(skip: 0, take: 100);
             // Make sure update binding on UI thread
             usersTask.ConfigureAwait(continueOnCapturedContext: true)
                 .GetAwaiter()

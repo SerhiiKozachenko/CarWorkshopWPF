@@ -12,6 +12,7 @@ namespace CarWorkshop.WPF.Pages.Workshops
         private readonly IWorkshopService _workshopService;
         private WorkshopModel _workshop;
         private string _companyNameValidationError;
+        private string _currentCity;
         private ICommand _addCommand;
         private ICommand _deleteCommand;
         private ICommand _clearCommand;
@@ -31,6 +32,22 @@ namespace CarWorkshop.WPF.Pages.Workshops
                     _workshop = value;
                     OnPropertyChanged("Workshop");
                     this.ResetValidationErrors();
+                }
+            }
+        }
+
+        public ObservableCollection<string> Cities { get; set; }
+
+        public string CurrentCity
+        {
+            get => _currentCity;
+            set
+            {
+                if (value != _currentCity)
+                {
+                    _currentCity = value;
+                    OnPropertyChanged("CurrentCity");
+                    this.FilterWorkshopsByCity();
                 }
             }
         }
@@ -88,15 +105,18 @@ namespace CarWorkshop.WPF.Pages.Workshops
             _workshopService = workshopService;
             _workshop = new WorkshopModel();
             this.Workshops = new ObservableCollection<WorkshopModel>();
+            this.Cities = new ObservableCollection<string>() { "All" };
+            this.CurrentCity = "All";
 
-            var workshopsTask = _workshopService.GetAllAsync(skip: 0, take: 100);
-            // Make sure update binding on UI thread
-            workshopsTask.ConfigureAwait(continueOnCapturedContext: true)
+            this.LoadAllWorkshops();
+
+            var availableCitiesTask = _workshopService.GetAvailableCities();
+            availableCitiesTask.ConfigureAwait(continueOnCapturedContext: true)
                 .GetAwaiter()
                 .OnCompleted(() =>
                 {
-                    this.Workshops = new ObservableCollection<WorkshopModel>(workshopsTask.Result.Select(w => new WorkshopModel(w)));
-                    RaisePropertyChanged("Workshops");
+                    availableCitiesTask.Result.ForEach(this.Cities.Add);
+                    RaisePropertyChanged("Cities");
                 });
         }
 
@@ -130,8 +150,20 @@ namespace CarWorkshop.WPF.Pages.Workshops
                         .GetAwaiter()
                         .OnCompleted(() =>
                         {
-                            this.Workshops.Add(new WorkshopModel(workshop));
-                            RaisePropertyChanged("Workshops");
+                            // Show only if we show Workshops for All citites or same city
+                            if (this.CurrentCity == "All" || this.CurrentCity == workshop.City)
+                            {
+                                this.Workshops.Add(new WorkshopModel(workshop));
+                                RaisePropertyChanged("Workshops");
+                            }
+
+                            // Add new city to filter
+                            if (this.Cities.All(c => c != workshop.City))
+                            {
+                                this.Cities.Add(workshop.City);
+                                RaisePropertyChanged("Cities");
+                            }
+                            
                             this.Clear();
                         });
                 });
@@ -165,6 +197,39 @@ namespace CarWorkshop.WPF.Pages.Workshops
         public void ResetValidationErrors()
         {
             this.CompanyNameValidationError = null;
+        }
+
+        public void LoadAllWorkshops()
+        {
+            var workshopsTask = _workshopService.GetWorkshopsAsync(skip: 0, take: 100);
+            // Make sure update binding on UI thread
+            workshopsTask.ConfigureAwait(continueOnCapturedContext: true)
+                .GetAwaiter()
+                .OnCompleted(() =>
+                {
+                    this.Workshops = new ObservableCollection<WorkshopModel>(workshopsTask.Result.Select(w => new WorkshopModel(w)));
+                    RaisePropertyChanged("Workshops");
+                });
+        }
+
+        public void FilterWorkshopsByCity()
+        {
+            if (this.CurrentCity == "All")
+            {
+                this.LoadAllWorkshops();
+            }
+            else
+            {
+                var workshopsInCityTask = _workshopService.GetWorkshopsInCityAsync(this.CurrentCity, 0, 100);
+                workshopsInCityTask.ConfigureAwait(continueOnCapturedContext: true)
+                   .GetAwaiter()
+                   .OnCompleted(() =>
+                   {
+                       this.Workshops = new ObservableCollection<WorkshopModel>(
+                           workshopsInCityTask.Result.Select(w => new WorkshopModel(w)));
+                       RaisePropertyChanged("Workshops");
+                   });
+            }
         }
 
         #endregion // Methods

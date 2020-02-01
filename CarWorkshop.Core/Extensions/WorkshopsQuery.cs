@@ -8,7 +8,13 @@ namespace CarWorkshop.Core.Extensions
         public static Workshop FindByCompanyName(this IQueryable<Workshop> workshops, string companyName)
         {
             companyName = companyName?.ToLowerInvariant();
-            return workshops.FirstOrDefault(u => u.CompanyName.ToLowerInvariant() == companyName);
+            return workshops.FirstOrDefault(w => w.CompanyName.ToLowerInvariant() == companyName);
+        }
+
+        public static IQueryable<Workshop> FilterByCity(this IQueryable<Workshop> workshops, string city)
+        {
+            city = city?.ToLowerInvariant();
+            return workshops.Where(w => w.City.ToLowerInvariant() == city);
         }
     }
 }

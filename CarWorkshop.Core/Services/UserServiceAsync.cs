@@ -36,9 +36,9 @@ namespace CarWorkshop.Core.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<List<User>> GetAllAsync(int skip, int take)
+        public async Task<List<User>> GetUsersAsync(int skip, int take)
         {
-            return (await _usersRepo.FetchAllAsync(skip, take)).ToList();
+            return (await _usersRepo.FetchAsync(skip, take)).ToList();
         }
 
         public async Task<bool> IsEmailExistsAsync(string email)

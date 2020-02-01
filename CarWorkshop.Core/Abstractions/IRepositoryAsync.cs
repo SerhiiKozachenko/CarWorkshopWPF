@@ -6,7 +6,7 @@ namespace CarWorkshop.Core.Abstractions
 {
     public interface IRepositoryAsync<T> where T : IHasID<long>
     {
-        Task<IEnumerable<T>> FetchAllAsync(int skip, int take);
+        Task<IEnumerable<T>> FetchAsync(int skip, int take);
         Task<IQueryable<T>> QueryAsync();
         Task<T> GetByIdAsync(long id);
         Task AddAsync(T entity);

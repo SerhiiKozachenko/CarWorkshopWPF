@@ -1,4 +1,5 @@
 ﻿using CarWorkshop.Core.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,7 +31,7 @@ namespace CarWorkshop.Data.InMemory
             _db.Remove<T>(entity);
         }
 
-        public async Task<IEnumerable<T>> FetchAllAsync(int skip, int take)
+        public async Task<IEnumerable<T>> FetchAsync(int skip, int take)
         {
             // Just to emulate async operation here
             return await Task.Run(() => _db.List<T>().Skip(skip).Take(take));
