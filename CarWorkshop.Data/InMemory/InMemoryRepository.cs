@@ -22,7 +22,7 @@ namespace CarWorkshop.Data.InMemory
 
         public async Task AddAsync(T entity)
         {
-            entity.Id = _db.List<T>().OrderBy(x => x.Id).Last().Id + 1;
+            entity.Id = _db.List<T>().OrderBy(x => x.Id).LastOrDefault()?.Id ?? 0 + 1;
             _db.Add<T>(entity);
         }
 
