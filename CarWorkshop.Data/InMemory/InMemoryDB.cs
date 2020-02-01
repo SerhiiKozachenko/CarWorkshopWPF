@@ -32,10 +32,10 @@ namespace CarWorkshop.Data.InMemory
 
         private void _FillInDefaultData()
         {
-            _users.Add(new User() { Id = 1, Username = "John", Email = "john@mail.com", City = "Berlin", Coutry = "Germany", PostalCode = "10115" });
-            _users.Add(new User() { Id = 2, Username = "Stefani", Email = "stefani@mail.com", City = "Berlin", Coutry = "Germany", PostalCode = "10178" });
-            _users.Add(new User() { Id = 3, Username = "David", Email = "david@mail.com", City = "Munich", Coutry = "Germany", PostalCode = "80331" });
-            _users.Add(new User() { Id = 4, Username = "Joana", Email = "joana@mail.com", City = "Munich", Coutry = "Germany", PostalCode = "80337" });
+            _users.Add(new User() { Id = 1, Username = "John", Email = "john@mail.com", City = "Berlin", Country = "Germany", PostalCode = "10115" });
+            _users.Add(new User() { Id = 2, Username = "Stefani", Email = "stefani@mail.com", City = "Berlin", Country = "Germany", PostalCode = "10178" });
+            _users.Add(new User() { Id = 3, Username = "David", Email = "david@mail.com", City = "Munich", Country = "Germany", PostalCode = "80331" });
+            _users.Add(new User() { Id = 4, Username = "Joana", Email = "joana@mail.com", City = "Munich", Country = "Germany", PostalCode = "80337" });
 
             _workshops.Add(new Workshop() { Id = 1, CompanyName = "Auto Service Munich", CarTrademarks = "BMW, VW, Mercedes, Ford", City = "Munich", Country = "Germany", PostalCode = "80331" });
             _workshops.Add(new Workshop() { Id = 2, CompanyName = "Auto Service Light", CarTrademarks = "VW, Ford", City = "Munich", Country = "Germany", PostalCode = "80337" });

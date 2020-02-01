@@ -15,8 +15,8 @@ namespace CarWorkshop.WPF.Pages.Users
         private UserModel _user;
         private string _usernameValidationError;
         private string _emailValidationError;
-        private ICommand _deleteCommand;
         private ICommand _addCommand;
+        private ICommand _deleteCommand;
         private ICommand _clearCommand;
 
         public string Name => "Users";
@@ -138,10 +138,10 @@ namespace CarWorkshop.WPF.Pages.Users
                 .GetAwaiter()
                 .OnCompleted(() =>
                 {
-                    if (userNameExistsTask != null && userNameExistsTask.Result)
+                    if (userNameExistsTask.Result)
                         this.UsernameValidationError = "Username already exists";
 
-                    if (emailExistsTask != null && emailExistsTask.Result)
+                    if (emailExistsTask.Result)
                         this.EmailValidationError = "Email already exists";
 
                     if (this.HasValidationError)

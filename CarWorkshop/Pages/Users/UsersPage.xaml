@@ -8,7 +8,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <GroupBox Header="Users" Margin="10,0,249,0">
-            <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding Users}" SelectedItem="{Binding User}">
+            <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding Users}" SelectedItem="{Binding User}" SelectionMode="Single" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Username" Binding="{Binding Username, Mode=OneTime}"/>
                     <DataGridTextColumn Header="Email" Binding="{Binding Email, Mode=OneTime}"/>

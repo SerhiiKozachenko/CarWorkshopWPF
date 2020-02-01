@@ -81,16 +81,14 @@ namespace CarWorkshop.WPF.Pages.Users
 
         public User Entity => _user;
 
-        public UserModel()
-        {
-            _user = new User();
-        }
-
         public UserModel(User user)
         {
             _user = user;
             this.Reset();
         }
+
+        public UserModel()
+            : this(new User()) { }
 
         public User MapNewEntity()
         {
@@ -100,7 +98,7 @@ namespace CarWorkshop.WPF.Pages.Users
                 Email = this.Email,
                 City = this.City,
                 PostalCode = this.PostalCode,
-                Coutry = this.Country
+                Country = this.Country
             };
         }
 
@@ -110,7 +108,7 @@ namespace CarWorkshop.WPF.Pages.Users
             _email = _user.Email;
             _city = _user.City;
             _postalCode = _user.PostalCode;
-            _country = _user.Coutry;
+            _country = _user.Country;
         }
     }
 }
