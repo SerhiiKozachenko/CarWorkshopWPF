@@ -21,6 +21,27 @@ namespace CarWorkshop.Core.Services
             _unitOfWork = unitOfWork;
         }
 
+        public async Task<List<User>> GetUsersAsync(int skip, int take)
+        {
+            return (await _usersRepo.FetchAsync(skip, take)).ToList();
+        }
+
+        public async Task<bool> IsUsernameExistsAsync(string username)
+        {
+            // For now simply query generic repo
+            // we can write more optimized version by creating special UserRepo
+            var user = (await _usersRepo.QueryAsync()).FindByUsername(username);
+            return user != null;
+        }
+
+        public async Task<bool> IsEmailExistsAsync(string email)
+        {
+            // For now simply query generic repo
+            // we can write more optimized version by creating special UserRepo
+            var user = (await _usersRepo.QueryAsync()).FindByEmail(email);
+            return user != null;
+        }
+
         public async Task AddAsync(User user)
         {
             await _usersRepo.AddAsync(user);
@@ -36,25 +57,5 @@ namespace CarWorkshop.Core.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<List<User>> GetUsersAsync(int skip, int take)
-        {
-            return (await _usersRepo.FetchAsync(skip, take)).ToList();
-        }
-
-        public async Task<bool> IsEmailExistsAsync(string email)
-        {
-            // For now simply query generic repo
-            // we can write more optimized version by creating special UserRepo
-            var user = (await _usersRepo.QueryAsync()).FindByEmail(email);
-            return user != null;
-        }
-
-        public async Task<bool> IsUsernameExistsAsync(string username)
-        {
-            // For now simply query generic repo
-            // we can write more optimized version by creating special UserRepo
-            var user = (await _usersRepo.QueryAsync()).FindByUsername(username);
-            return user != null;
-        }
     }
 }

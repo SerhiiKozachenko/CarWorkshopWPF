@@ -29,6 +29,29 @@ namespace CarWorkshop.Core.Services
             _unitOfWork = unitOfWork;
         }
 
+        public async Task<List<Appointment>> GetAppointmentsAsync(int skip, int take)
+        {
+            return (await _appointmentsRepo.FetchAsync(skip, take)).ToList();
+        }
+
+        public async Task<List<string>> GetUsernamesAsync(int skip, int take)
+        {
+            return (await _usersRepo.QueryAsync())
+                .Select(w => w.Username)
+                .Skip(skip)
+                .Take(take)
+                .ToList();
+        }
+
+        public async Task<List<string>> GetWorkshopNamesAsync(int skip, int take)
+        {
+            return (await _workshopsRepo.QueryAsync())
+                .Select(w => w.CompanyName)
+                .Skip(skip)
+                .Take(take)
+                .ToList();
+        }
+
         public async Task AddAsync(Appointment appointment)
         {
             var validationErrors = new ValidationErrors();
@@ -55,35 +78,6 @@ namespace CarWorkshop.Core.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(Appointment appointment)
-        {
-            await _appointmentsRepo.DeleteAsync(appointment);
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task<List<Appointment>> GetAppointmentsAsync(int skip, int take)
-        {
-            return (await _appointmentsRepo.FetchAsync(skip, take)).ToList();
-        }
-
-        public async Task<List<string>> GetUsernamesAsync(int skip, int take)
-        {
-            return (await _usersRepo.QueryAsync())
-                .Select(w => w.Username)
-                .Skip(skip)
-                .Take(take)
-                .ToList();
-        }
-
-        public async Task<List<string>> GetWorkshopNamesAsync(int skip, int take)
-        {
-            return (await _workshopsRepo.QueryAsync())
-                .Select(w => w.CompanyName)
-                .Skip(skip)
-                .Take(take)
-                .ToList();
-        }
-
         public async Task UpdateAppointmentAtAsync(Appointment appointment)
         {
             if (appointment.AppointmentAt <= DateTime.Now)
@@ -91,6 +85,12 @@ namespace CarWorkshop.Core.Services
 
             var origAppointment = await _appointmentsRepo.GetByIdAsync(appointment.Id);
             origAppointment.AppointmentAt = appointment.AppointmentAt;
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(Appointment appointment)
+        {
+            await _appointmentsRepo.DeleteAsync(appointment);
             await _unitOfWork.SaveChangesAsync();
         }
     }

@@ -12,6 +12,7 @@ namespace CarWorkshop.WPF.Pages.Appointments
 {
     public class AppointmentsVM : BaseViewModel, IPageModel
     {
+        #region Fields
         private readonly IAppointmentServiceAsync _appointmentsService;
         private AppointmentModel _appointment;
         private string _usernameValidationError;
@@ -22,6 +23,10 @@ namespace CarWorkshop.WPF.Pages.Appointments
         private ICommand _deleteCommand;
         private ICommand _clearCommand;
         private ICommand _updateCommand;
+
+        #endregion // Fields
+
+        #region Properties / Commands
 
         public string Name => "Appointments";
 
@@ -154,11 +159,10 @@ namespace CarWorkshop.WPF.Pages.Appointments
             }
         }
 
+        #endregion // Properties / Commands
+
         public AppointmentsVM(
-            IAppointmentServiceAsync appointmentsService,
-            IUserServiceAsync usersService,
-            IWorkshopServiceAsync workshopsService
-            )
+            IAppointmentServiceAsync appointmentsService)
         {
             _appointmentsService = appointmentsService;
             _appointment = new AppointmentModel();
@@ -172,35 +176,30 @@ namespace CarWorkshop.WPF.Pages.Appointments
             for (int m = 0; m <= 59; m++)
                 this.Minutes.Add(m);
 
-            var appointmentsTask = _appointmentsService.GetAppointmentsAsync(skip: 0, take: 100);
-            // Make sure update binding on UI thread
-            appointmentsTask.ConfigureAwait(continueOnCapturedContext: true)
-                .GetAwaiter()
-                .OnCompleted(() =>
+            _appointmentsService.GetAppointmentsAsync(skip: 0, take: 100)
+                .ContinueOnUIThread(appointments =>
                 {
                     this.Appointments = new ObservableCollection<AppointmentModel>(
-                        appointmentsTask.Result.Select(u => new AppointmentModel(u)));
+                        appointments.Select(u => new AppointmentModel(u)));
                     RaisePropertyChanged("Appointments");
                 });
 
-            var usernamesTask = _appointmentsService.GetUsernamesAsync(skip: 0, take: 100);
-            usernamesTask.ConfigureAwait(continueOnCapturedContext: true)
-                .GetAwaiter()
-                .OnCompleted(() =>
+            _appointmentsService.GetUsernamesAsync(skip: 0, take: 100)
+                .ContinueOnUIThread(usernames =>
                 {
-                    usernamesTask.Result.ForEach(this.Usernames.Add);
+                    usernames.ForEach(this.Usernames.Add);
                     RaisePropertyChanged("Usernames");
                 });
 
-            var companyNamesTask = _appointmentsService.GetWorkshopNamesAsync(skip: 0, take: 100);
-            companyNamesTask.ConfigureAwait(continueOnCapturedContext: true)
-                .GetAwaiter()
-                .OnCompleted(() =>
+            _appointmentsService.GetWorkshopNamesAsync(skip: 0, take: 100)
+                .ContinueOnUIThread(companyNames =>
                 {
-                    companyNamesTask.Result.ForEach(this.CompanyNames.Add);
+                    companyNames.ForEach(this.CompanyNames.Add);
                     RaisePropertyChanged("CompanyNames");
                 });
         }
+
+        #region Methods
 
         public void Add(object param)
         {
@@ -210,21 +209,18 @@ namespace CarWorkshop.WPF.Pages.Appointments
                 return;
 
             var appointment = this.Appointment.MapNewEntity();
-            var addTask = _appointmentsService.AddAsync(appointment);
-            addTask.ConfigureAwait(continueOnCapturedContext: true)
-            .GetAwaiter()
-            .OnCompleted(() =>
-            {
-
-                if (addTask.IsCompletedSuccessfully)
+            _appointmentsService.AddAsync(appointment)
+                .ContinueOnUIThread(() =>
                 {
                     this.Appointments.Add(new AppointmentModel(appointment));
                     RaisePropertyChanged("Appointments");
                     this.Clear();
-                }
-                else if (addTask.Exception?.InnerException is ValidationErrors)
+                },
+                error =>
                 {
-                    ((ValidationErrors)addTask.Exception.InnerException)
+                    if (error.InnerException is ValidationErrors)
+                    {
+                        ((ValidationErrors)error.InnerException)
                         .Errors.ForEach(err =>
                         {
                             switch (err.PropertyName)
@@ -246,36 +242,22 @@ namespace CarWorkshop.WPF.Pages.Appointments
                                     break;
                             }
                         });
-                }
-                else if (addTask.Exception != null)
-                    throw addTask.Exception;
-            });
+                    }
+                    else throw error;
+                });
         }
 
         public void Delete(object param)
         {
             if (this.Appointment.IsSaved)
-            {
-                var deleteTask = _appointmentsService.DeleteAsync(this.Appointment.Entity);
-
-                deleteTask.ConfigureAwait(continueOnCapturedContext: true)
-                    .GetAwaiter()
-                    .OnCompleted(() =>
+                _appointmentsService.DeleteAsync(this.Appointment.Entity)
+                    .ContinueOnUIThread(() =>
                     {
-                        if (deleteTask.IsCompletedSuccessfully)
-                        {
-                            this.Appointments.Remove(this.Appointment);
-                            RaisePropertyChanged("Appointments");
-                            this.Clear();
-                        }
-                        else if (deleteTask.Exception != null)
-                            throw deleteTask.Exception;
+                        this.Appointments.Remove(this.Appointment);
+                        RaisePropertyChanged("Appointments");
+                        this.Clear();
                     });
-            }
-            else
-            {
-                this.Clear();
-            }
+            else this.Clear();
         }
 
         public void Clear(object param = null)
@@ -283,32 +265,22 @@ namespace CarWorkshop.WPF.Pages.Appointments
             this.Appointment = new AppointmentModel();
         }
 
-        public void Update(object param = null)
+        public void Update(object param)
         {
             if (this.Appointment.IsSaved)
             {
                 var appointment = this.Appointment.MapNewEntity();
                 appointment.Id = this.Appointment.Entity.Id;
-                var updateTask = _appointmentsService.UpdateAppointmentAtAsync(appointment);
-                updateTask.ConfigureAwait(continueOnCapturedContext: true)
-                        .GetAwaiter()
-                        .OnCompleted(() =>
-                        {
-                            if (updateTask.IsCompletedSuccessfully)
-                            {
-                                var index = this.Appointments.IndexOf(this.Appointment);
-                                this.Appointments.Remove(this.Appointment);
-                                this.Appointment = new AppointmentModel(appointment);
-                                this.Appointments.Insert(index, this.Appointment);
-                                RaisePropertyChanged("Appointments");
-                                this.Clear();
-                                //this.Appointments.Remove(this.Appointment);
-                                //RaisePropertyChanged("Appointments");
-                                //this.Clear();
-                            }
-                            else if (updateTask.Exception != null)
-                                throw updateTask.Exception;
-                        });
+                _appointmentsService.UpdateAppointmentAtAsync(appointment)
+                    .ContinueOnUIThread(() =>
+                    {
+                        var index = this.Appointments.IndexOf(this.Appointment);
+                        this.Appointments.Remove(this.Appointment);
+                        this.Appointment = new AppointmentModel(appointment);
+                        this.Appointments.Insert(index, this.Appointment);
+                        RaisePropertyChanged("Appointments");
+                        this.Clear();
+                    });
             }
         }
 
@@ -336,5 +308,7 @@ namespace CarWorkshop.WPF.Pages.Appointments
                     this.CompanyNameValidationError =
                         this.AppointmentAtValidationError = null;
         }
+
+        #endregion // Methods
     }
 }

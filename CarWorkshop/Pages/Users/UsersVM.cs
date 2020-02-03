@@ -11,6 +11,8 @@ namespace CarWorkshop.WPF.Pages.Users
 {
     public class UsersVM : BaseViewModel, IPageModel
     {
+        #region Fields
+
         private readonly IUserServiceAsync _usersService;
         private UserModel _user;
         private string _usernameValidationError;
@@ -18,6 +20,10 @@ namespace CarWorkshop.WPF.Pages.Users
         private ICommand _addCommand;
         private ICommand _deleteCommand;
         private ICommand _clearCommand;
+
+        #endregion // Fields
+
+        #region Properties / Commands
 
         public string Name => "Users";
 
@@ -103,22 +109,24 @@ namespace CarWorkshop.WPF.Pages.Users
             }
         }
 
+        #endregion // Properties / Commands
+
         public UsersVM(IUserServiceAsync usersService)
         {
             _usersService = usersService;
             _user = new UserModel();
             this.Users = new ObservableCollection<UserModel>();
 
-            var usersTask = _usersService.GetUsersAsync(skip: 0, take: 100);
-            // Make sure update binding on UI thread
-            usersTask.ConfigureAwait(continueOnCapturedContext: true)
-                .GetAwaiter()
-                .OnCompleted(() =>
+            _usersService.GetUsersAsync(skip: 0, take: 100)
+                .ContinueOnUIThread(users =>
                 {
-                    this.Users = new ObservableCollection<UserModel>(usersTask.Result.Select(u => new UserModel(u)));
+                    this.Users = new ObservableCollection<UserModel>(
+                        users.Select(u => new UserModel(u)));
                     RaisePropertyChanged("Users");
                 });
         }
+
+        #region Methods
 
         public void Add(object param)
         {
@@ -131,9 +139,7 @@ namespace CarWorkshop.WPF.Pages.Users
             var emailExistsTask = _usersService.IsEmailExistsAsync(this.User.Email);
 
             Task.WhenAll(userNameExistsTask, emailExistsTask)
-                .ConfigureAwait(continueOnCapturedContext: true)
-                .GetAwaiter()
-                .OnCompleted(() =>
+                .ContinueOnUIThread(() =>
                 {
                     if (userNameExistsTask.Result)
                         this.UsernameValidationError = "Username already exists";
@@ -146,9 +152,7 @@ namespace CarWorkshop.WPF.Pages.Users
 
                     var user = this.User.MapNewEntity();
                     _usersService.AddAsync(user)
-                        .ConfigureAwait(continueOnCapturedContext: true)
-                        .GetAwaiter()
-                        .OnCompleted(() =>
+                        .ContinueOnUIThread(() =>
                         {
                             this.Users.Add(new UserModel(user));
                             RaisePropertyChanged("Users");
@@ -160,21 +164,14 @@ namespace CarWorkshop.WPF.Pages.Users
         public void Delete(object param)
         {
             if (this.User.IsSaved)
-            {
                 _usersService.DeleteAsync(this.User.Entity)
-                    .ConfigureAwait(continueOnCapturedContext: true)
-                    .GetAwaiter()
-                    .OnCompleted(() =>
+                    .ContinueOnUIThread(() =>
                     {
                         this.Users.Remove(this.User);
                         RaisePropertyChanged("Users");
                         this.Clear();
                     });
-            }
-            else
-            {
-                this.Clear();
-            }
+            else this.Clear();
         }
 
         public void Clear(object param = null)
@@ -198,5 +195,7 @@ namespace CarWorkshop.WPF.Pages.Users
             this.UsernameValidationError =
                 this.EmailValidationError = null;
         }
+
+        #endregion // Methods
     }
 }

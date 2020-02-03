@@ -9,6 +9,8 @@ namespace CarWorkshop.WPF.Pages.Workshops
 {
     public class WorkshopsVM : BaseViewModel, IPageModel
     {
+        #region Fields
+
         private readonly IWorkshopServiceAsync _workshopService;
         private WorkshopModel _workshop;
         private string _companyNameValidationError;
@@ -16,6 +18,10 @@ namespace CarWorkshop.WPF.Pages.Workshops
         private ICommand _addCommand;
         private ICommand _deleteCommand;
         private ICommand _clearCommand;
+
+        #endregion // Fields
+
+        #region Properties / Commands
 
         public string Name => "Workshops";
 
@@ -100,6 +106,8 @@ namespace CarWorkshop.WPF.Pages.Workshops
             }
         }
 
+        #endregion // Properties / Commands
+
         public WorkshopsVM(IWorkshopServiceAsync workshopService)
         {
             _workshopService = workshopService;
@@ -108,19 +116,17 @@ namespace CarWorkshop.WPF.Pages.Workshops
             this.Cities = new ObservableCollection<string>() { "All" };
             this.CurrentCity = "All";
 
-            this.LoadAllWorkshops();
+            this.LoadAllWorkshopsAsync();
 
-            var availableCitiesTask = _workshopService.GetAvailableCities();
-            availableCitiesTask.ConfigureAwait(continueOnCapturedContext: true)
-                .GetAwaiter()
-                .OnCompleted(() =>
-                {
-                    availableCitiesTask.Result.ForEach(this.Cities.Add);
+            _workshopService.GetAvailableCitiesAsync()
+                .ContinueOnUIThread(availableCities => {
+                    availableCities.ForEach(this.Cities.Add);
                     RaisePropertyChanged("Cities");
                 });
         }
 
         #region Methods
+
         public void Add(object param)
         {
             this.ResetValidationErrors();
@@ -132,13 +138,10 @@ namespace CarWorkshop.WPF.Pages.Workshops
             if (this.HasValidationError)
                 return;
 
-            var companyNameExistsTask = _workshopService.IsCompanyNameExistsAsync(this.Workshop.CompanyName);
-
-            companyNameExistsTask.ConfigureAwait(continueOnCapturedContext: true)
-                .GetAwaiter()
-                .OnCompleted(() =>
+            _workshopService.IsCompanyNameExistsAsync(this.Workshop.CompanyName)
+                .ContinueOnUIThread(isCompanyNameExists =>
                 {
-                    if (companyNameExistsTask.Result)
+                    if (isCompanyNameExists)
                         this.CompanyNameValidationError = "CompanyName already exists";
 
                     if (this.HasValidationError)
@@ -146,9 +149,7 @@ namespace CarWorkshop.WPF.Pages.Workshops
 
                     var workshop = this.Workshop.MapNewEntity();
                     _workshopService.AddAsync(workshop)
-                        .ConfigureAwait(continueOnCapturedContext: true)
-                        .GetAwaiter()
-                        .OnCompleted(() =>
+                        .ContinueOnUIThread(() =>
                         {
                             // Show only if we show Workshops for All citites or same city
                             if (this.CurrentCity == "All" || this.CurrentCity == workshop.City)
@@ -163,7 +164,7 @@ namespace CarWorkshop.WPF.Pages.Workshops
                                 this.Cities.Add(workshop.City);
                                 RaisePropertyChanged("Cities");
                             }
-                            
+
                             this.Clear();
                         });
                 });
@@ -172,22 +173,15 @@ namespace CarWorkshop.WPF.Pages.Workshops
         public void Delete(object param)
         {
             if (this.Workshop.IsSaved)
-            {
                 _workshopService.DeleteAsync(this.Workshop.Entity)
-                    .ConfigureAwait(continueOnCapturedContext: true)
-                    .GetAwaiter()
-                    .OnCompleted(() =>
+                    .ContinueOnUIThread(() =>
                     {
                         this.Workshops.Remove(this.Workshop);
                         RaisePropertyChanged("Workshops");
                         this.Clear();
                     });
-            }
-            else
-            {
-                this.Clear();
-            }
-        }
+            else this.Clear();
+    }
 
         public void Clear(object param = null)
         {
@@ -199,15 +193,12 @@ namespace CarWorkshop.WPF.Pages.Workshops
             this.CompanyNameValidationError = null;
         }
 
-        public void LoadAllWorkshops()
+        public void LoadAllWorkshopsAsync()
         {
-            var workshopsTask = _workshopService.GetWorkshopsAsync(skip: 0, take: 100);
-            // Make sure update binding on UI thread
-            workshopsTask.ConfigureAwait(continueOnCapturedContext: true)
-                .GetAwaiter()
-                .OnCompleted(() =>
-                {
-                    this.Workshops = new ObservableCollection<WorkshopModel>(workshopsTask.Result.Select(w => new WorkshopModel(w)));
+            _workshopService.GetWorkshopsAsync(skip: 0, take: 100)
+                .ContinueOnUIThread(workshops => {
+                    this.Workshops = new ObservableCollection<WorkshopModel>(
+                        workshops.Select(w => new WorkshopModel(w)));
                     RaisePropertyChanged("Workshops");
                 });
         }
@@ -215,21 +206,15 @@ namespace CarWorkshop.WPF.Pages.Workshops
         public void FilterWorkshopsByCity()
         {
             if (this.CurrentCity == "All")
-            {
-                this.LoadAllWorkshops();
-            }
+                this.LoadAllWorkshopsAsync();
             else
-            {
-                var workshopsInCityTask = _workshopService.GetWorkshopsInCityAsync(this.CurrentCity, 0, 100);
-                workshopsInCityTask.ConfigureAwait(continueOnCapturedContext: true)
-                   .GetAwaiter()
-                   .OnCompleted(() =>
-                   {
-                       this.Workshops = new ObservableCollection<WorkshopModel>(
-                           workshopsInCityTask.Result.Select(w => new WorkshopModel(w)));
-                       RaisePropertyChanged("Workshops");
-                   });
-            }
+                _workshopService.GetWorkshopsInCityAsync(this.CurrentCity, 0, 100)
+                    .ContinueOnUIThread(workshopsInCity =>
+                    {
+                        this.Workshops = new ObservableCollection<WorkshopModel>(
+                               workshopsInCity.Select(w => new WorkshopModel(w)));
+                        RaisePropertyChanged("Workshops");
+                    });
         }
 
         #endregion // Methods
