@@ -3,5 +3,7 @@
     public interface IPageModel
     {
         string Name { get; }
+
+        void OnPageInit();
     }
 }

@@ -116,7 +116,12 @@ namespace CarWorkshop.WPF.Pages.Users
             _usersService = usersService;
             _user = new UserModel();
             this.Users = new ObservableCollection<UserModel>();
+        }
 
+        #region Methods
+
+        public void OnPageInit()
+        {
             _usersService.GetUsersAsync(skip: 0, take: 100)
                 .ContinueOnUIThread(users =>
                 {
@@ -125,8 +130,6 @@ namespace CarWorkshop.WPF.Pages.Users
                     RaisePropertyChanged("Users");
                 });
         }
-
-        #region Methods
 
         public void Add(object param)
         {

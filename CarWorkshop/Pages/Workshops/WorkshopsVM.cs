@@ -115,17 +115,22 @@ namespace CarWorkshop.WPF.Pages.Workshops
             this.Workshops = new ObservableCollection<WorkshopModel>();
             this.Cities = new ObservableCollection<string>() { "All" };
             this.CurrentCity = "All";
+        }
 
+        #region Methods
+
+        public void OnPageInit()
+        {
             this.LoadAllWorkshopsAsync();
 
             _workshopService.GetAvailableCitiesAsync()
-                .ContinueOnUIThread(availableCities => {
+                .ContinueOnUIThread(availableCities =>
+                {
+                    this.Cities = new ObservableCollection<string>() { "All" };
                     availableCities.ForEach(this.Cities.Add);
                     RaisePropertyChanged("Cities");
                 });
         }
-
-        #region Methods
 
         public void Add(object param)
         {

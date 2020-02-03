@@ -44,6 +44,7 @@ namespace CarWorkshop.WPF
                 if (_currentPage != value)
                 {
                     _currentPage = value;
+                    _currentPage.OnPageInit();
                     OnPropertyChanged("CurrentPage");
                 }
             }

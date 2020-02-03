@@ -175,7 +175,12 @@ namespace CarWorkshop.WPF.Pages.Appointments
             this.Minutes = new ObservableCollection<int>();
             for (int m = 0; m <= 59; m++)
                 this.Minutes.Add(m);
+        }
 
+        #region Methods
+
+        public void OnPageInit()
+        {
             _appointmentsService.GetAppointmentsAsync(skip: 0, take: 100)
                 .ContinueOnUIThread(appointments =>
                 {
@@ -187,19 +192,17 @@ namespace CarWorkshop.WPF.Pages.Appointments
             _appointmentsService.GetUsernamesAsync(skip: 0, take: 100)
                 .ContinueOnUIThread(usernames =>
                 {
-                    usernames.ForEach(this.Usernames.Add);
+                    this.Usernames = new ObservableCollection<string>(usernames);
                     RaisePropertyChanged("Usernames");
                 });
 
             _appointmentsService.GetWorkshopNamesAsync(skip: 0, take: 100)
                 .ContinueOnUIThread(companyNames =>
                 {
-                    companyNames.ForEach(this.CompanyNames.Add);
+                    this.CompanyNames = new ObservableCollection<string>(companyNames);
                     RaisePropertyChanged("CompanyNames");
                 });
         }
-
-        #region Methods
 
         public void Add(object param)
         {
