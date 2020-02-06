@@ -20,9 +20,9 @@ namespace CarWorkshop.Core.Extensions
         public static IQueryable<Workshop> FilterByCityAndCar(this IQueryable<Workshop> workshops, string city, string car)
         {
             city = city?.ToLowerInvariant();
-            return workshops.Where(w => w.City.ToLowerInvariant() == city &&
+            return workshops.Where(w => w.City.ToLower() == city &&
                 w.CarTrademarks.Split(',', System.StringSplitOptions.RemoveEmptyEntries)
-                    .Select(c => c.ToLowerInvariant())
+                    .Select(c => c.ToLower())
                     .Contains(car.ToLowerInvariant())
                 );
         }

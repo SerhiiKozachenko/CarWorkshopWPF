@@ -19,13 +19,13 @@ namespace CarWorkshop.WPF.Infra
             services.AddTransient<IAppointmentServiceAsync, AppointmentServiceAsync>();
 
             // Data
-            //services.AddSingleton<InMemoryDB>();
-            services.AddSingleton<EFDBContext>();
+            services.AddSingleton<InMemoryDB>();
+            //services.AddSingleton<EFDBContext>();
             // TODO: In order to switch to real DB, replace implementation of IRepositoryAsync and IUnitOfWork
-            // services.AddSingleton<IUnitOfWork, InMemoryDB>(serviceProvider => serviceProvider.GetService<InMemoryDB>());
-            services.AddSingleton<IUnitOfWork, EFDBContext>(serviceProvider => serviceProvider.GetService<EFDBContext>());
-            // services.AddTransient(typeof(IRepositoryAsync<>), typeof(InMemoryRepository<>));
-            services.AddTransient(typeof(IRepositoryAsync<>), typeof(EFRepository<>));
+            services.AddSingleton<IUnitOfWork, InMemoryDB>(serviceProvider => serviceProvider.GetService<InMemoryDB>());
+            // services.AddSingleton<IUnitOfWork, EFDBContext>(serviceProvider => serviceProvider.GetService<EFDBContext>());
+            services.AddTransient(typeof(IRepositoryAsync<>), typeof(InMemoryRepository<>));
+            // services.AddTransient(typeof(IRepositoryAsync<>), typeof(EFRepository<>));
 
             // UI
             services.AddSingleton<MainWindow>();
