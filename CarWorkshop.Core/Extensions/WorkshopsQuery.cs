@@ -16,5 +16,15 @@ namespace CarWorkshop.Core.Extensions
             city = city?.ToLowerInvariant();
             return workshops.Where(w => w.City.ToLower() == city);
         }
+
+        public static IQueryable<Workshop> FilterByCityAndCar(this IQueryable<Workshop> workshops, string city, string car)
+        {
+            city = city?.ToLowerInvariant();
+            return workshops.Where(w => w.City.ToLowerInvariant() == city &&
+                w.CarTrademarks.Split(',', System.StringSplitOptions.RemoveEmptyEntries)
+                    .Select(c => c.ToLowerInvariant())
+                    .Contains(car.ToLowerInvariant())
+                );
+        }
     }
 }

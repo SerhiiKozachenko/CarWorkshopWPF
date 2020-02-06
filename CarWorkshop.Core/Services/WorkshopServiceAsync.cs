@@ -55,6 +55,9 @@ namespace CarWorkshop.Core.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
-        
+        public async Task<int> CountWorkshopsInCityForCarAsync(string city, string carTrademark, int skip, int take)
+        {
+            return (await _workshopsRepo.QueryAsync()).FilterByCityAndCar(city, carTrademark).Count();
+        }
     }
 }
