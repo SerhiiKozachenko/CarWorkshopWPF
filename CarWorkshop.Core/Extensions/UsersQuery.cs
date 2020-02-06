@@ -8,13 +8,13 @@ namespace CarWorkshop.Core.Extensions
         public static User FindByEmail(this IQueryable<User> users, string email)
         {
             email = email?.ToLowerInvariant();
-            return users.FirstOrDefault(u => u.Email.ToLowerInvariant() == email);
+            return users.FirstOrDefault(u => u.Email.ToLower() == email);
         }
 
         public static User FindByUsername(this IQueryable<User> users, string username)
         {
             username = username?.ToLowerInvariant();
-            return users.FirstOrDefault(u => u.Username.ToLowerInvariant() == username);
+            return users.FirstOrDefault(u => u.Username.ToLower() == username);
         }
     }
 }
